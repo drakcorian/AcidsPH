@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Acids, pH & Particles Quiz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+:root{color-scheme:light}
+html,body{min-height:100%}
+body{background:#6B4FB8;min-height:100vh;display:flex;flex-direction:column;color:#222}
+
+#bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,0,0,0.14);flex-shrink:0}
+#prog-wrap{flex:1;height:6px;background:rgba(255,255,255,0.3);border-radius:3px;overflow:hidden}
+#prog{height:100%;width:0%;background:#fff;border-radius:3px;transition:width .3s}
+#lv{background:rgba(0,0,0,0.2);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+#teacher-toggle{background:rgba(0,0,0,0.2);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer}
+
+#quiz-view{flex:1;display:flex;flex-direction:column}
+#retry-bar{background:#c0392b;color:#fff;font-size:13px;font-weight:600;text-align:center;padding:6px;display:none}
+#stage{flex:1;padding:12px;display:flex;justify-content:center;align-items:flex-start}
+#card{background:#fff;border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.18)}
+
+#qhead{padding:22px 18px 14px;text-align:center}
+#badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.b-form{background:#E8F0FE;color:#1F4E9C}
+.b-ph{background:#FDEBF3;color:#9B2C5E}
+.b-part{background:#E1F5EE;color:#0F6E56}
+.b-term{background:#F1F1F1;color:#444}
+#qtext{font-size:21px;font-weight:700;color:#111;line-height:1.3}
+#qtext.mid{font-size:17px}
+#qtext.long{font-size:15px;font-weight:600}
+#qsub{font-size:12px;color:#999;margin-top:6px}
+
+#grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#d0d0d0;border-top:2px solid #d0d0d0}
+#grid.wide{grid-template-columns:1fr}
+#grid.wide .opt{min-height:0}
+.opt{background:#f0f0f0;padding:16px 12px;display:flex;align-items:flex-start;gap:8px;min-height:90px;cursor:pointer}
+.opt:active{background:#e0e0e0}
+.opt.ok{background:#d4edda}.opt.bad{background:#f8d7da}.opt.show{background:#d4edda}
+.num{width:20px;height:20px;border-radius:4px;background:#ccc;color:#555;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.opt.ok .num,.opt.show .num{background:#28a745;color:#fff}
+.opt.bad .num{background:#dc3545;color:#fff}
+.txt{font-size:14px;color:#333;line-height:1.35;min-width:0;overflow-wrap:anywhere}
+.opt.ok .txt,.opt.show .txt{color:#155724;font-weight:600}
+.opt.bad .txt{color:#721c24}
+
+#frow{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;min-height:48px;border-top:1px solid #eee;gap:8px}
+#fb-wrap{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+#fb{font-size:13px;font-weight:600}
+#fnote{font-size:13px;color:#555;line-height:1.5;display:none;padding-top:2px}
+.fbok{color:#155724}.fbbad{color:#721c24}
+#nxt{background:#55399C;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;display:none;-webkit-appearance:none;flex-shrink:0;align-self:center}
+
+#stats{display:flex;border-top:1px solid #eee}
+.st{flex:1;text-align:center;padding:9px 2px;border-right:1px solid #eee}
+.st:last-child{border-right:none}
+.sv{font-size:17px;font-weight:700;color:#333}
+.sl{font-size:10px;color:#999;margin-top:2px}
+
+#level-summary,#done{display:none;flex-direction:column;align-items:center;padding:28px 18px;text-align:center}
+#level-summary h2,#done h2{font-size:22px;font-weight:700;color:#222;margin-bottom:6px}
+#done p{font-size:13px;color:#777;margin-bottom:18px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:20px}
+.dc{background:#f5f5f5;border-radius:10px;padding:12px}
+.dv{font-size:22px;font-weight:700;color:#333}
+.dl{font-size:11px;color:#999;margin-top:2px}
+.dbtn{display:block;width:100%;border:none;border-radius:11px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;-webkit-appearance:none}
+.dbtn:last-child{margin-bottom:0}
+.teal{background:#55399C;color:#fff}
+.green{background:#28a745;color:#fff}
+.lv-badge{font-size:48px;margin-bottom:8px}
+.lv-tag{display:inline-block;background:#55399C;color:#fff;font-size:13px;font-weight:700;padding:4px 16px;border-radius:20px;margin-bottom:12px}
+.unlock-msg{font-size:13px;color:#155724;font-weight:600;margin-bottom:16px;padding:10px 14px;background:#d4edda;border-radius:10px;width:100%}
+
+#levels{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 12px 14px}
+.lvjump{background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.lvjump.on{background:#fff;color:#55399C}
+
+button:focus-visible,.opt:focus-visible{outline:3px solid #2e1d63;outline-offset:2px}
+
+/* teacher view */
+#teacher-view{display:none;flex:1;flex-direction:column;background:#f7f7f7}
+#tv-toolbar{background:#fff;border-bottom:1px solid #eee;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;flex-wrap:wrap}
+#tv-toolbar h2{font-size:16px;font-weight:700;color:#222}
+#tv-toolbar-right{display:flex;gap:8px;flex-wrap:wrap}
+.tv-btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none}
+.tv-btn.green{background:#28a745;color:#fff}
+.tv-btn.gray{background:#eee;color:#555}
+#tv-scroll{flex:1;overflow-y:auto;padding:12px 14px}
+.qcard{background:#fff;border-radius:12px;margin-bottom:12px;overflow:hidden;border:1px solid #e8e8e8}
+.qcard-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9f9f9;border-bottom:1px solid #eee;cursor:pointer;gap:8px}
+.qcard-num{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.qcard-preview{font-size:13px;color:#555;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.qcard-lv{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#E1F5EE;color:#0F6E56;flex-shrink:0}
+.qcard-del{background:#f8d7da;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:#721c24;cursor:pointer;flex-shrink:0}
+.qcard-body{padding:12px 14px;display:none;flex-direction:column;gap:10px}
+.qcard-body.open{display:flex}
+.field-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.field-input{width:100%;padding:9px 11px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;background:#fff;color:#222;outline:none;-webkit-appearance:none;font-family:inherit}
+.field-input:focus{border-color:#6B4FB8}
+textarea.field-input{resize:vertical;min-height:60px;line-height:1.4}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{border:1.5px solid #e0e0e0;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:#888;cursor:pointer;background:#fff}
+.pill.active{border-color:#6B4FB8;background:#E1F5EE;color:#0F6E56}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hint{font-size:12px;color:#888}
+#add-btn{display:block;width:100%;background:#fff;border:2px dashed #6B4FB8;border-radius:10px;padding:13px;font-size:14px;font-weight:700;color:#55399C;cursor:pointer;text-align:center;margin-top:4px;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <div id="prog-wrap"><div id="prog"></div></div>
+  <div id="lv">Level 1</div>
+  <button id="teacher-toggle">✏ Teacher</button>
+</div>
+
+<div id="quiz-view">
+  <div id="retry-bar">🔁 Retesting cards you missed</div>
+  <div id="stage">
+    <div id="card">
+      <div id="qhead">
+        <div id="badge" class="b-form">loading</div>
+        <div id="qtext">Getting ready…</div>
+        <div id="qsub"></div>
+      </div>
+      <div id="grid">
+        <div class="opt" id="o0" tabindex="0"><div class="num">1</div><div class="txt"></div></div>
+        <div class="opt" id="o1" tabindex="0"><div class="num">2</div><div class="txt"></div></div>
+        <div class="opt" id="o2" tabindex="0"><div class="num">3</div><div class="txt"></div></div>
+        <div class="opt" id="o3" tabindex="0"><div class="num">4</div><div class="txt"></div></div>
+      </div>
+      <div id="frow">
+        <div id="fb-wrap">
+          <div id="fb"></div>
+          <div id="fnote"></div>
+        </div>
+        <button id="nxt">Next →</button>
+      </div>
+      <div id="stats">
+        <div class="st"><div class="sv" id="sc">0</div><div class="sl">correct</div></div>
+        <div class="st"><div class="sv" id="sr">0</div><div class="sl">retry</div></div>
+        <div class="st"><div class="sv" id="ss">0</div><div class="sl">streak 🔥</div></div>
+        <div class="st"><div class="sv" id="sa">—</div><div class="sl">accuracy</div></div>
+      </div>
+
+      <div id="level-summary">
+        <div class="lv-badge" id="ls-emoji">⭐</div>
+        <div class="lv-tag" id="ls-tag">Level 1 Complete!</div>
+        <h2 id="ls-title">Nice work!</h2>
+        <div class="dg">
+          <div class="dc"><div class="dv" id="ls-c">0</div><div class="dl">correct</div></div>
+          <div class="dc"><div class="dv" id="ls-w">0</div><div class="dl">wrong</div></div>
+          <div class="dc"><div class="dv" id="ls-acc">—</div><div class="dl">accuracy</div></div>
+          <div class="dc"><div class="dv" id="ls-xp">0</div><div class="dl">XP earned</div></div>
+        </div>
+        <div class="unlock-msg" id="ls-unlock"></div>
+        <button class="dbtn green" id="ls-next">Next Level →</button>
+        <button class="dbtn teal" id="ls-retry">Retry this level</button>
+      </div>
+
+      <div id="done">
+        <div style="font-size:44px;margin-bottom:8px">🏆</div>
+        <h2>All levels complete!</h2>
+        <p id="dsub"></p>
+        <div class="dg">
+          <div class="dc"><div class="dv" id="dc1">0</div><div class="dl">correct</div></div>
+          <div class="dc"><div class="dv" id="dc2">0</div><div class="dl">wrong</div></div>
+          <div class="dc"><div class="dv" id="dc3">—</div><div class="dl">accuracy</div></div>
+          <div class="dc"><div class="dv" id="dc4">0</div><div class="dl">XP earned</div></div>
+        </div>
+        <button class="dbtn teal" id="d-again">Play again from Level 1</button>
+      </div>
+    </div>
+  </div>
+  <div id="levels"></div>
+</div>
+
+<div id="teacher-view">
+  <div id="tv-toolbar">
+    <h2>✏ Question Editor</h2>
+    <div id="tv-toolbar-right">
+      <button class="tv-btn gray" id="tv-reset">Restore defaults</button>
+      <button class="tv-btn gray" id="tv-cancel">Cancel</button>
+      <button class="tv-btn green" id="tv-save">Save &amp; Play</button>
+    </div>
+  </div>
+  <div id="tv-scroll">
+    <div id="qlist"></div>
+    <button id="add-btn">+ Add question</button>
+  </div>
+</div>
+
+<script>
+// Year 10 Chemistry — Acid and base formulas, pH and indicators, particle motion (Task 8 revision)
+// Levels: 1 Acid & Base Formulas · 2 pH & Indicators · 3 Particles & Temperature · 4 Terminology
+// Types (badge colour): form, ph, part, term
+// "term" cards flip: sometimes show the term (pick the definition), sometimes the definition (pick the term).
+// Chemical formulas use Unicode subscripts and superscripts (H₂SO₄, Cu²⁺) so they display without HTML.
+
+var LEVEL_INFO=[
+  null,
+  {"emoji": "🔤", "title": "Acid & Base Formulas", "unlock": "Level 2 unlocked: pH & Indicators!"},
+  {"emoji": "🌈", "title": "pH & Indicators", "unlock": "Level 3 unlocked: Particles & Temperature!"},
+  {"emoji": "⚛️", "title": "Particles & Temperature", "unlock": "Level 4 unlocked: Terminology!"},
+  {"emoji": "📖", "title": "Terminology", "unlock": "You've completed all levels!"}
+];
+var MAX_LEVEL=4;
+
+var DEFAULT_DATA=[
+  // ── LEVEL 1: Acid & Base Formulas ──
+  {"lv":1,"t":"form","q":"What is the formula of hydrochloric acid?","a":"HCl","x":["HCl₂","H₂Cl","ClH₂"],"note":"One H⁺ and one Cl⁻."},
+  {"lv":1,"t":"form","q":"What is the formula of sulfuric acid?","a":"H₂SO₄","x":["HSO₄","H₂SO₃","H₂S"],"note":"Two H⁺ balance one SO₄²⁻."},
+  {"lv":1,"t":"form","q":"What is the formula of nitric acid?","a":"HNO₃","x":["HNO₂","H₂NO₃","NO₃"],"note":"One H⁺ and one NO₃⁻."},
+  {"lv":1,"t":"form","q":"What is the formula of ethanoic acid (vinegar)?","a":"CH₃COOH","x":["C₂H₅OH","CH₃COO","HCOOH"],"note":"C₂H₅OH is ethanol, HCOOH is formic acid, and CH₃COO on its own is the ethanoate ion."},
+  {"lv":1,"t":"form","q":"What is the formula of sodium hydroxide?","a":"NaOH","x":["NaOH₂","Na(OH)₂","NaH"],"note":"Na⁺ needs one OH⁻."},
+  {"lv":1,"t":"form","q":"What is the formula of calcium hydroxide?","a":"Ca(OH)₂","x":["CaOH","CaOH₂","Ca₂OH"],"note":"Ca²⁺ needs two OH⁻, with brackets."},
+  {"lv":1,"t":"form","q":"What is the formula of magnesium hydroxide?","a":"Mg(OH)₂","x":["MgOH","Mg₂OH","MgO"],"note":"Mg²⁺ needs two OH⁻. MgO is magnesium oxide."},
+  {"lv":1,"t":"form","q":"What is the formula of sodium carbonate?","a":"Na₂CO₃","x":["NaCO₃","Na₂CO₂","NaHCO₃"],"note":"Two Na⁺ balance one CO₃²⁻. NaHCO₃ is sodium hydrogen carbonate (baking soda)."},
+  {"lv":1,"t":"form","q":"What is the formula of ammonia?","a":"NH₃","x":["NH₄","N₂H","NH₄OH"],"note":"NH₄⁺ is the ammonium ion, which is different from ammonia."},
+  {"lv":1,"t":"form","q":"What do all acids have in their formula?","a":"Hydrogen (H)","x":["Hydroxide (OH)","Carbonate (CO₃)","Oxygen (O)"],"note":"HCl has no oxygen, so it can't be oxygen. Hydroxide and carbonate are found in bases."},
+  {"lv":1,"t":"form","q":"Many bases contain…","a":"Hydroxide (OH) or carbonate (CO₃)","x":["Hydrogen (H) only","Chloride (Cl)","Nitrate (NO₃)"],"note":"E.g. NaOH and Mg(OH)₂ are hydroxides; Na₂CO₃ and CaCO₃ are carbonates."},
+  {"lv":1,"t":"form","q":"Which of these is a base?","a":"Mg(OH)₂","x":["HNO₃","CH₃COOH","H₂SO₄"],"note":"It contains hydroxide. The others are acids."},
+  // ── LEVEL 2: pH & Indicators ──
+  {"lv":2,"t":"ph","q":"A solution with pH 3 is…","a":"Acidic","x":["Neutral","Basic","Impossible to tell without litmus"],"note":"Below 7 is acidic."},
+  {"lv":2,"t":"ph","q":"Which pH is the most acidic?","a":"pH 1","x":["pH 5","pH 7","pH 13"],"note":"Lower pH = more acidic."},
+  {"lv":2,"t":"ph","q":"Which pH is the most basic?","a":"pH 13","x":["pH 8","pH 7","pH 1"],"note":"Higher pH = more basic."},
+  {"lv":2,"t":"ph","q":"Pure water has a pH of…","a":"7","x":["0","1","14"],"note":"7 is neutral."},
+  {"lv":2,"t":"ph","q":"What colour is universal indicator in a neutral solution?","a":"Green","x":["Red","Purple","Yellow"],"note":"Acids: red, orange, yellow. Neutral: green. Bases: blue, purple."},
+  {"lv":2,"t":"ph","q":"What colour is universal indicator in drain cleaner (a strong base)?","a":"Purple","x":["Red","Green","Yellow"],"note":"Strong bases have a high pH, which is purple."},
+  {"lv":2,"t":"ph","q":"What colour is universal indicator in vinegar?","a":"Red or orange","x":["Green","Blue","Purple"],"note":"Vinegar is acidic, with a pH around 3."},
+  {"lv":2,"t":"ph","q":"Blue litmus paper dipped in an acid turns…","a":"Red","x":["Blue (no change)","Green","Purple"],"note":"Blue litmus turns red in acid."},
+  {"lv":2,"t":"ph","q":"Red litmus paper is dipped in lemon juice. It…","a":"Stays red","x":["Turns blue","Turns green","Turns purple"],"note":"Red litmus only changes in bases. Lemon juice is an acid."},
+  {"lv":2,"t":"ph","q":"Why use universal indicator rather than litmus to compare two acids?","a":"It shows how acidic something is, not just acid or base","x":["Litmus doesn't work in acids","Universal indicator only works on acids","Litmus is more accurate"],"note":"Litmus only tells you acid or base. Universal indicator gives a pH."},
+  {"lv":2,"t":"ph","q":"Universal indicator is added to sodium hydroxide, then acid is added drop by drop. The colour goes…","a":"Purple → blue → green","x":["Red → orange → green","Green → purple → blue","Purple → red → green"],"note":"It starts basic (purple) and reaches neutral (green). Extra acid would take it to yellow, orange, then red."},
+  {"lv":2,"t":"ph","q":"Acid + base reactions are called neutralisation because…","a":"They make a salt and water, which are neutral","x":["They always make carbon dioxide","The acid disappears and nothing is made","They make hydrogen gas"],"note":"The pH moves towards 7."},
+  {"lv":2,"t":"ph","q":"A bee sting injects formic acid. What would help?","a":"A weak base, like baking soda","x":["Vinegar","Lemon juice","A strong acid"],"note":"A base neutralises the acid. Vinegar and lemon juice are acids, so they'd add to the problem."},
+  {"lv":2,"t":"ph","q":"Which properties belong to acids?","a":"Sour taste; prickling or burning on skin","x":["Bitter taste; soapy feel","Bitter taste; prickling on skin","Sour taste; soapy feel"],"note":"Bases taste bitter and feel soapy. Strong acids and strong bases are both corrosive."},
+  // ── LEVEL 3: Particles & Temperature ──
+  {"lv":3,"t":"part","q":"Particles in a solid…","a":"Vibrate in fixed positions","x":["Move past each other","Move fast and randomly, far apart","Don't move at all"],"note":"They're held in place, but they still vibrate."},
+  {"lv":3,"t":"part","q":"Particles in a liquid…","a":"Are close together but move past each other","x":["Vibrate in fixed positions","Are far apart and move fast","Don't move at all"],"note":"That's why liquids flow and take the shape of their container."},
+  {"lv":3,"t":"part","q":"Particles in a gas…","a":"Are far apart and move fast in random directions","x":["Vibrate in fixed positions","Are close together and slide past each other","Only move when heated"],"note":"That's why gases spread out to fill any container."},
+  {"lv":3,"t":"part","q":"Temperature is a measure of…","a":"The average kinetic energy of the particles","x":["The total number of particles","How much heat a substance holds","The size of the particles"],"note":"Kinetic energy is energy of movement, so hotter means faster particles."},
+  {"lv":3,"t":"part","q":"When a substance is heated, its particles…","a":"Move faster on average","x":["Get bigger","Slow down","Stop colliding"],"note":"Particles don't change size. They gain kinetic energy."},
+  {"lv":3,"t":"part","q":"While ice melts, the temperature stays flat even though heat is still added. Why?","a":"The energy goes into breaking the attractions between particles","x":["The thermometer stops working","The particles are speeding up","Heat escapes as fast as it's added"],"note":"Potential energy rises but kinetic energy doesn't, so the temperature stays the same until all the ice has melted."},
+  {"lv":3,"t":"part","q":"Reactions go faster when warmer because particles…","a":"Collide more often and with more energy","x":["Get bigger","Become more concentrated","No longer need activation energy"],"note":"More collisions have at least the activation energy, so there are more successful collisions per second."},
+  {"lv":3,"t":"part","q":"Kinetic energy is the energy of…","a":"Movement","x":["Position","Light","Colour"],"note":"Energy of position or arrangement is potential energy."},
+  // ── LEVEL 4: Terminology ──
+  {"lv":4,"t":"term","q":"Acid","a":"A substance that contains hydrogen, tastes sour and has a pH below 7","x":[],"note":""},
+  {"lv":4,"t":"term","q":"Base","a":"A substance that often contains hydroxide or carbonate, tastes bitter and has a pH above 7","x":[],"note":""},
+  {"lv":4,"t":"term","q":"Indicator","a":"A chemical that changes colour in the presence of acids and bases","x":[],"note":"E.g. litmus and universal indicator."},
+  {"lv":4,"t":"term","q":"pH scale","a":"A scale from 0 to 14 used to compare how acidic or basic a substance is","x":[],"note":"7 is neutral."},
+  {"lv":4,"t":"term","q":"Neutralisation","a":"A reaction between an acid and a base that produces a salt and water","x":[],"note":""},
+  {"lv":4,"t":"term","q":"Salt","a":"An ionic compound made from a metal and a non-metal (or group of non-metals)","x":[],"note":"E.g. sodium chloride, copper sulfate."},
+  {"lv":4,"t":"term","q":"Corrosive","a":"Able to destroy or eat away at other substances","x":[],"note":"Strong acids and strong bases are both corrosive."},
+  {"lv":4,"t":"term","q":"Temperature","a":"A measure of the average kinetic energy of the particles in a substance","x":[],"note":""},
+  {"lv":4,"t":"term","q":"Kinetic energy","a":"The energy an object or particle has because it is moving","x":[],"note":""}
+];
+
+var STORE_KEY="garrick-acids-ph-v1";
+function copyData(src){return src.map(function(d){return JSON.parse(JSON.stringify(d));});}
+function loadData(){
+  try{var raw=localStorage.getItem(STORE_KEY);if(raw){var p=JSON.parse(raw);if(Array.isArray(p)&&p.length)return p;}}catch(e){}
+  return copyData(DEFAULT_DATA);
+}
+function saveData(){try{localStorage.setItem(STORE_KEY,JSON.stringify(DATA));}catch(e){}}
+var DATA=loadData();
+
+// ── game state ──
+var currentLevel=1;
+var deck=[],weak=[],cur=null,answered=false;
+var C=0,W=0,streak=0,lvXP=0;
+var totalC=0,totalW=0,totalXP=0;
+
+function shuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function cardsForLevel(lv){return DATA.filter(function(d){return d.lv===lv;});}
+function $(id){return document.getElementById(id);}
+
+function startLevel(lv){
+  currentLevel=lv;
+  deck=shuf(cardsForLevel(lv).slice());
+  weak=[];C=0;W=0;streak=0;lvXP=0;
+  hideAll();
+  $("retry-bar").style.display="none";
+  updateBar();updateStats();renderJumps();
+  next();
+}
+
+function hideAll(){
+  ["qhead","grid","frow","stats","level-summary","done"].forEach(function(id){$(id).style.display="none";});
+}
+
+var BADGES={form:["b-form","formulas"],ph:["b-ph","pH & indicators"],part:["b-part","particles"],term:["b-term","terminology"]};
+var TERM_POOL_MIN=4;
+
+function next(){
+  answered=false;
+  $("nxt").style.display="none";
+  $("fb").textContent="";$("fb").className="";
+  $("fnote").style.display="none";$("fnote").textContent="";
+
+  if(!deck.length&&!weak.length){showLevelSummary();return;}
+  if(!deck.length){deck=shuf(weak.slice());weak=[];$("retry-bar").style.display="block";}
+
+  cur=deck.shift();updateProg();
+  var b=BADGES[cur.t]||["b-form","question"];
+  $("badge").className=b[0];$("badge").textContent=b[1];
+
+  var qt,qs,correct,dists;
+  if(cur.t==="term"){
+    var pool=DATA.filter(function(c){return c!==cur&&c.t==="term";});
+    var showTerm=Math.random()<0.5;
+    if(showTerm){qt=cur.q;qs="Which definition matches this term?";correct=cur.a;dists=shuf(pool.slice()).map(function(c){return c.a;});}
+    else{qt=cur.a;qs="Which term matches this definition?";correct=cur.q;dists=shuf(pool.slice()).map(function(c){return c.q;});}
+  } else {
+    qt=cur.q;qs="Choose the best answer";correct=cur.a;dists=shuf((cur.x||[]).filter(function(s){return s&&s.trim();}).slice());
+  }
+  dists=dists.filter(function(d){return d!==correct;}).slice(0,3);
+
+  var qel=$("qtext");qel.textContent=qt;
+  qel.className=qt.length>130?"long":(qt.length>70?"mid":"");
+  $("qsub").textContent=qs;
+  $("qhead").style.display="block";$("frow").style.display="flex";$("stats").style.display="flex";$("grid").style.display="grid";
+
+  var opts=shuf([correct].concat(dists));
+  $("grid").className=opts.some(function(o){return o&&o.length>38;})?"wide":"";
+  for(var i=0;i<4;i++){
+    var el=$("o"+i);
+    el.className="opt";
+    el.style.display=opts[i]===undefined?"none":"flex";
+    el.querySelector(".txt").textContent=opts[i]||"";
+    el.dataset.val=opts[i]||"";
+  }
+  bindOpts(correct);
+}
+
+function showNote(){
+  if(cur.note&&cur.note.trim()){$("fnote").textContent=cur.note;$("fnote").style.display="block";}
+}
+
+function bindOpts(correct){
+  for(var i=0;i<4;i++){
+    (function(el){
+      var n=el.cloneNode(true);el.parentNode.replaceChild(n,el);
+      function handle(e){if(e.type==="touchend")e.preventDefault();pick(n,n.dataset.val,correct);}
+      n.addEventListener("touchend",handle,{passive:false});
+      n.addEventListener("click",handle);
+      n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();handle(e);}});
+    })($("o"+i));
+  }
+}
+
+function pick(el,chosen,correct){
+  if(answered)return;answered=true;
+  for(var i=0;i<4;i++){var t=$("o"+i);if(t.dataset.val===correct)t.classList.add("show");}
+  var fb=$("fb");
+  if(chosen===correct){
+    el.classList.add("ok");el.classList.remove("show");
+    C++;totalC++;streak++;
+    var gain=15+(streak>=3?5:0);lvXP+=gain;totalXP+=gain;
+    fb.textContent=streak>=3?"✓ "+streak+" streak! +"+gain+" XP":"✓ Correct!";fb.className="fbok";
+  } else {
+    el.classList.add("bad");W++;totalW++;streak=0;weak.push(cur);
+    fb.textContent="✗ Answer: "+correct;fb.className="fbbad";
+  }
+  showNote();updateStats();
+  $("nxt").style.display="block";
+}
+
+function updateBar(){$("lv").textContent="Level "+currentLevel+" / "+MAX_LEVEL;}
+function updateStats(){
+  $("sc").textContent=C;$("sr").textContent=weak.length;$("ss").textContent=streak;
+  var tot=C+W;$("sa").textContent=tot?Math.round(C/tot*100)+"%":"—";
+}
+function updateProg(){
+  var total=C+W+deck.length+weak.length+1;
+  $("prog").style.width=Math.round((C+W)/total*100)+"%";
+}
+
+function renderJumps(){
+  var h=$("levels");h.innerHTML="";
+  for(var n=1;n<=MAX_LEVEL;n++){(function(n){
+    var b=document.createElement("button");b.className="lvjump"+(n===currentLevel?" on":"");
+    b.textContent=LEVEL_INFO[n].emoji+" "+n;b.title=LEVEL_INFO[n].title;b.setAttribute("aria-label","Jump to level "+n+": "+LEVEL_INFO[n].title);
+    b.addEventListener("click",function(){startLevel(n);});
+    h.appendChild(b);
+  })(n);}
+}
+
+function showLevelSummary(){
+  hideAll();$("retry-bar").style.display="none";
+  var info=LEVEL_INFO[currentLevel],tot=C+W;
+  $("ls-emoji").textContent=info.emoji;
+  $("ls-tag").textContent="Level "+currentLevel+" Complete!";
+  $("ls-title").textContent=info.title;
+  $("ls-c").textContent=C;$("ls-w").textContent=W;
+  $("ls-acc").textContent=tot?Math.round(C/tot*100)+"%":"—";
+  $("ls-xp").textContent=lvXP;
+  $("ls-unlock").textContent=info.unlock;
+  $("ls-next").textContent=currentLevel>=MAX_LEVEL?"See final results 🏆":"Start Level "+(currentLevel+1)+" →";
+  $("prog").style.width="100%";
+  $("level-summary").style.display="flex";
+}
+
+function showFinalDone(){
+  hideAll();$("done").style.display="flex";
+  var tot=totalC+totalW;
+  $("dc1").textContent=totalC;$("dc2").textContent=totalW;
+  $("dc3").textContent=tot?Math.round(totalC/tot*100)+"%":"—";
+  $("dc4").textContent=totalXP;
+  $("dsub").textContent="All "+MAX_LEVEL+" levels cleared!";
+  $("prog").style.width="100%";
+}
+
+function wire(id,fn){
+  var el=$(id);if(!el)return;
+  el.addEventListener("touchend",function(e){e.preventDefault();fn();},{passive:false});
+  el.addEventListener("click",fn);
+}
+
+wire("nxt",next);
+wire("ls-next",function(){if(currentLevel>=MAX_LEVEL)showFinalDone();else startLevel(currentLevel+1);});
+wire("ls-retry",function(){startLevel(currentLevel);});
+wire("d-again",function(){totalC=0;totalW=0;totalXP=0;startLevel(1);});
+
+// ── teacher editor ──
+var snapshot=null;
+wire("teacher-toggle",function(){
+  if($("teacher-view").style.display==="flex"){DATA=snapshot||DATA;showQuiz();}else{showTeacher();}
+});
+function showQuiz(){$("quiz-view").style.display="flex";$("teacher-view").style.display="none";}
+function showTeacher(){
+  snapshot=copyData(DATA);
+  $("quiz-view").style.display="none";$("teacher-view").style.display="flex";
+  renderEditor();
+}
+wire("tv-save",function(){saveData();snapshot=null;showQuiz();totalC=0;totalW=0;totalXP=0;startLevel(1);});
+wire("tv-cancel",function(){DATA=snapshot||DATA;snapshot=null;showQuiz();});
+var resetArmed=false;
+wire("tv-reset",function(){
+  var b=$("tv-reset");
+  if(!resetArmed){resetArmed=true;b.textContent="Tap again to restore";setTimeout(function(){resetArmed=false;b.textContent="Restore defaults";},3000);return;}
+  resetArmed=false;b.textContent="Restore defaults";
+  DATA=copyData(DEFAULT_DATA);renderEditor();
+});
+
+var TYPES=["form", "ph", "part", "term"];
+var TYPE_LABELS={form:"Acid & Base Formulas",ph:"pH & Indicators",part:"Particles & Temperature",term:"Terminology"};
+
+function renderEditor(){
+  var list=$("qlist");list.innerHTML="";
+  DATA.forEach(function(d,i){renderCard(d,i,list);});
+}
+
+function pillRow(label,values,labelFor,isActive,onPick){
+  var w=document.createElement("div");w.innerHTML='<div class="field-label">'+label+'</div>';
+  var row=document.createElement("div");row.className="pills";
+  values.forEach(function(v){
+    var p=document.createElement("div");p.className="pill"+(isActive(v)?" active":"");p.textContent=labelFor(v);
+    p.addEventListener("click",function(){onPick(v);row.querySelectorAll(".pill").forEach(function(x){x.classList.remove("active");});p.classList.add("active");});
+    row.appendChild(p);
+  });
+  w.appendChild(row);return w;
+}
+
+function renderCard(d,i,list){
+  var wrap=document.createElement("div");wrap.className="qcard";
+  var hdr=document.createElement("div");hdr.className="qcard-header";
+  hdr.innerHTML='<span class="qcard-num">Q'+(i+1)+'</span><span class="qcard-preview">'+escHtml(d.q)+'</span><span class="qcard-lv">Lv '+d.lv+'</span><button class="qcard-del">Delete</button>';
+  wrap.appendChild(hdr);
+  var body=document.createElement("div");body.className="qcard-body";
+
+  body.appendChild(pillRow("Level",LEVEL_INFO.map(function(_,n){return n;}).slice(1),function(n){return "Level "+n;},function(n){return d.lv===n;},function(n){d.lv=n;hdr.querySelector(".qcard-lv").textContent="Lv "+n;}));
+  body.appendChild(pillRow("Type",TYPES,function(t){return TYPE_LABELS[t];},function(t){return d.t===t;},function(t){d.t=t;}));
+  body.appendChild(makeField("Question (or term, for terminology)",d.q,function(v){d.q=v;hdr.querySelector(".qcard-preview").textContent=v;}));
+  body.appendChild(makeField("Correct answer (or definition, for terminology)",d.a,function(v){d.a=v;}));
+
+  var ob=document.createElement("div");
+  ob.innerHTML='<div class="field-label" style="margin-bottom:6px">Wrong options (3)</div><div class="hint" style="margin-bottom:6px">Terminology cards ignore these: their wrong options come from the other terms.</div>';
+  var og=document.createElement("div");og.className="opts-grid";
+  for(var j=0;j<3;j++){(function(j){
+    var inp=document.createElement("input");inp.className="field-input";inp.type="text";inp.value=(d.x&&d.x[j])||"";
+    inp.setAttribute("aria-label","Wrong option "+(j+1));
+    inp.addEventListener("input",function(){if(!d.x)d.x=[];d.x[j]=inp.value;});
+    og.appendChild(inp);
+  })(j);}
+  ob.appendChild(og);body.appendChild(ob);
+  body.appendChild(makeTextarea("Explanation shown after answering",d.note||"",function(v){d.note=v;}));
+  wrap.appendChild(body);
+
+  hdr.addEventListener("click",function(e){if(e.target.classList.contains("qcard-del"))return;body.classList.toggle("open");});
+  var del=hdr.querySelector(".qcard-del"),armed=false;
+  del.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(!armed){armed=true;del.textContent="Sure?";setTimeout(function(){armed=false;del.textContent="Delete";},3000);return;}
+    DATA.splice(i,1);renderEditor();
+  });
+  list.appendChild(wrap);
+}
+
+function makeField(label,val,onChange){
+  var w=document.createElement("div");
+  var l=document.createElement("div");l.className="field-label";l.textContent=label;
+  var inp=document.createElement("input");inp.className="field-input";inp.type="text";inp.value=val;
+  inp.addEventListener("input",function(){onChange(inp.value);});
+  w.appendChild(l);w.appendChild(inp);return w;
+}
+function makeTextarea(label,val,onChange){
+  var w=document.createElement("div");
+  var l=document.createElement("div");l.className="field-label";l.textContent=label;
+  var ta=document.createElement("textarea");ta.className="field-input";ta.value=val;ta.rows=3;
+  ta.addEventListener("input",function(){onChange(ta.value);});
+  w.appendChild(l);w.appendChild(ta);return w;
+}
+
+wire("add-btn",function(){
+  DATA.push({lv:currentLevel,t:"form",q:"New question",a:"Correct answer",x:["Wrong 1","Wrong 2","Wrong 3"],note:""});
+  renderEditor();
+  var cards=document.querySelectorAll(".qcard-body");
+  if(cards.length)cards[cards.length-1].classList.add("open");
+  $("tv-scroll").scrollTop=999999;
+});
+
+function escHtml(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+startLevel(1);
+</script>
+</body>
+</html>
